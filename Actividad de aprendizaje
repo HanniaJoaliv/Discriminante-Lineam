@@ -1,0 +1,60 @@
+import pandas as pd
+
+data = pd.read_csv('datos_credito.csv')
+
+missing_values = data.isnull().sum()
+print(missing_values)
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Boxplot para visualizar valores atípicos
+sns.boxplot(x=data['Ingreso_Mensual'])
+plt.title('Boxplot de Ingreso Mensual')
+plt.show()
+
+# Histograma de Ingreso_Mensual
+sns.histplot(data['Ingreso_Mensual'], bins=30)
+plt.title('Distribución de Ingreso Mensual')
+plt.xlabel('Ingreso Mensual')
+plt.ylabel('Frecuencia')
+plt.show()
+
+
+
+
+
+
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, classification_report
+
+# Separar características y variable objetivo
+X = data.drop('Clase', axis=1)
+y = data['Clase']
+
+# Dividir el dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Crear el modelo LDA
+lda = LDA()
+lda.fit(X_train, y_train)
+
+# Predicciones
+y_pred = lda.predict(X_test)
+
+# Matriz de confusión
+cm = confusion_matrix(y_test, y_pred)
+print("Matriz de Confusión:\n", cm)
+
+
+
+
+from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(lda, X, y, cv=5)
+print("Precisión media de validación cruzada:", scores.mean())
+
+print("Coeficientes Discriminantes:\n", lda.coef_)
+
+print(classification_report(y_test, y_pred))
